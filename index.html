@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lisa Hanna Beauty · Traffic & Revenue Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --rose:       #8B3A5A;
+    --rose-light: #C27A96;
+    --rose-pale:  #F5E8EE;
+    --rose-deep:  #5C1F3A;
+    --gold:       #C4974A;
+    --gold-light: #EDD9B0;
+    --cream:      #FAF6F1;
+    --sand:       #EDE5DA;
+    --charcoal:   #2A1F24;
+    --muted:      #7A6570;
+    --white:      #FFFFFF;
+    --green-bg:   #E8F4EE;
+    --green-txt:  #2D6A4F;
+    --amber-bg:   #FDF3E3;
+    --amber-txt:  #92600A;
+    --red-bg:     #FDECEC;
+    --red-txt:    #8B2020;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 10% 10%, rgba(139,58,90,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 90% 90%, rgba(196,151,74,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* HEADER */
+  header { text-align: center; padding: 3rem 0 2.5rem; }
+  .brand-tag {
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rose-light);
+    border: 1px solid var(--rose-light);
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 1.2rem;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 300;
+    color: var(--rose-deep);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  h1 em { font-style: italic; color: var(--rose); }
+  .header-sub {
+    margin-top: 0.75rem;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rose-light), transparent);
+    margin: 1.5rem auto 0;
+  }
+
+  /* GRID LAYOUT */
+  .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  @media (max-width: 700px) { .grid-inputs { grid-template-columns: 1fr; } }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid rgba(139,58,90,0.10);
+    padding: 1.5rem;
+    box-shadow: 0 2px 20px rgba(44,31,36,0.04);
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    display: inline-block;
+    width: 18px; height: 1px;
+    background: var(--rose-light);
+  }
+
+  /* SLIDERS */
+  .input-group { margin-bottom: 1.25rem; }
+  .input-group:last-child { margin-bottom: 0; }
+  .input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .input-label span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--rose-deep);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%; height: 3px;
+    background: var(--sand);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    margin: 8px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--rose);
+    border: 3px solid var(--white);
+    box-shadow: 0 0 0 1px var(--rose-light), 0 2px 8px rgba(139,58,90,0.3);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px var(--rose-light), 0 4px 12px rgba(139,58,90,0.4);
+  }
+  .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* METRIC CARDS */
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  @media (max-width: 800px) { .metrics-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .metrics-row { grid-template-columns: 1fr 1fr; } }
+
+  .metric-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid rgba(139,58,90,0.09);
+    padding: 1.2rem 1.1rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(44,31,36,0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--rose), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .metric-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(44,31,36,0.08); }
+  .metric-card:hover::after { transform: scaleX(1); }
+  .metric-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .metric-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--rose-deep);
+    line-height: 1;
+    transition: all 0.3s;
+  }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* FULL-WIDTH CARD */
+  .full-card { margin-bottom: 1.5rem; }
+
+  /* TABLE */
+  .conv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .conv-table th {
+    text-align: left; padding: 10px 14px;
+    background: var(--rose-pale);
+    color: var(--rose-deep);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .conv-table th:first-child { border-radius: 8px 0 0 8px; }
+  .conv-table th:last-child { border-radius: 0 8px 8px 0; }
+  .conv-table td { padding: 11px 14px; border-bottom: 1px solid rgba(139,58,90,0.06); color: var(--charcoal); }
+  .conv-table tr:hover td { background: rgba(245,232,238,0.4); }
+  .conv-table tr.highlight-row td { background: var(--rose-pale); font-weight: 500; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .badge-green  { background: var(--green-bg);  color: var(--green-txt); }
+  .badge-amber  { background: var(--amber-bg);  color: var(--amber-txt); }
+  .badge-red    { background: var(--red-bg);    color: var(--red-txt); }
+  .badge-rose   { background: var(--rose-pale); color: var(--rose-deep); }
+
+  /* CHARTS */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ROAS SECTION */
+  .roas-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 1rem; }
+  @media (max-width: 600px) { .roas-grid { grid-template-columns: 1fr; } }
+  .roas-card {
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .roas-card:hover { transform: translateY(-2px); }
+  .roas-bad  { background: var(--red-bg);   border: 1px solid rgba(139,32,32,0.15); }
+  .roas-ok   { background: var(--amber-bg); border: 1px solid rgba(146,96,10,0.15); }
+  .roas-good { background: var(--green-bg); border: 1px solid rgba(45,106,79,0.15); }
+  .roas-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .roas-label.bad  { color: var(--red-txt); }
+  .roas-label.ok   { color: var(--amber-txt); }
+  .roas-label.good { color: var(--green-txt); }
+  .roas-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .roas-value.bad  { color: var(--red-txt); }
+  .roas-value.ok   { color: var(--amber-txt); }
+  .roas-value.good { color: var(--green-txt); }
+  .roas-sub { font-size: 11px; margin-top: 4px; }
+  .roas-sub.bad  { color: var(--red-txt); }
+  .roas-sub.ok   { color: var(--amber-txt); }
+  .roas-sub.good { color: var(--green-txt); }
+
+  /* INSIGHT BOX */
+  .insight {
+    margin-top: 1.2rem;
+    background: linear-gradient(135deg, var(--rose-pale), var(--gold-light));
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    font-size: 13px;
+    color: var(--rose-deep);
+    line-height: 1.6;
+    border-left: 3px solid var(--rose);
+  }
+  .insight strong { font-weight: 500; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 2rem 0 0;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card, .metric-card {
+    animation: fadeUp 0.5s ease both;
+  }
+  .metric-card:nth-child(1) { animation-delay: 0.05s; }
+  .metric-card:nth-child(2) { animation-delay: 0.10s; }
+  .metric-card:nth-child(3) { animation-delay: 0.15s; }
+  .metric-card:nth-child(4) { animation-delay: 0.20s; }
+
+  .pulse { animation: pulse 0.3s ease; }
+  @keyframes pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--rose-pale) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B3A5A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border: 1px solid rgba(139,58,90,0.2);
+    border-radius: 8px;
+    padding: 8px 32px 8px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--rose-deep);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  select:hover { border-color: var(--rose-light); }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand-tag">Lisa Hanna Beauty</div>
+    <h1>Traffic & Revenue <em>Calculator</em></h1>
+    <p class="header-sub">Adjust the inputs below — all metrics update in real time</p>
+    <div class="divider"></div>
+  </header>
+
+  <!-- INPUTS ROW -->
+  <div class="grid-inputs">
+    <div class="card">
+      <div class="card-title">Store Settings</div>
+
+      <div class="input-group">
+        <div class="input-label">Products to sell <span id="val-products">66,000</span></div>
+        <input type="range" id="inp-products" min="1000" max="200000" step="1000" value="66000">
+        <div class="range-labels"><span>1K</span><span>200K</span></div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Products per order <span id="val-ppo">1</span></div>
+        <input type="range" id="inp-ppo" min="1" max="10" step="1" value="1">
+        <div class="range-labels"><span>1</span><span>10</span></div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Time period (months) <span id="val-months">6</span></div>
+        <input type="range" id="inp-months" min="1" max="24" step="1" value="6">
+        <div class="range-labels"><span>1m</span><span>24m</span></div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Conversion rate <span id="val-conv">1.0%</span></div>
+        <input type="range" id="inp-conv" min="0.1" max="10" step="0.1" value="1.0">
+        <div class="range-labels"><span>0.1%</span><span>10%</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Revenue & Ads Settings</div>
+
+      <div class="input-group">
+        <div class="input-label">Avg. order value (€) <span id="val-aov">35</span></div>
+        <input type="range" id="inp-aov" min="5" max="500" step="5" value="35">
+        <div class="range-labels"><span>€5</span><span>€500</span></div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Cost per click — CPC (€) <span id="val-cpc">0.50</span></div>
+        <input type="range" id="inp-cpc" min="0.05" max="5" step="0.05" value="0.50">
+        <div class="range-labels"><span>€0.05</span><span>€5.00</span></div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Product cost / COGS (€) <span id="val-cogs">10</span></div>
+        <input type="range" id="inp-cogs" min="1" max="400" step="1" value="10">
+        <div class="range-labels"><span>€1</span><span>€400</span></div>
+      </div>
+
+      <div class="input-group" style="margin-top:0.5rem">
+        <div class="input-label" style="margin-bottom:8px">Traffic source</div>
+        <select id="inp-source">
+          <option value="1.0">100% Paid Ads</option>
+          <option value="0.7" selected>70% Paid · 30% Organic</option>
+          <option value="0.5">50% Paid · 50% Organic</option>
+          <option value="0.3">30% Paid · 70% Organic</option>
+          <option value="0.0">100% Organic / SEO</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI METRICS -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Visits / Day</div>
+      <div class="metric-value" id="kpi-visits-day">—</div>
+      <div class="metric-sub">to sell all stock</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total visits needed</div>
+      <div class="metric-value" id="kpi-visits-total">—</div>
+      <div class="metric-sub" id="kpi-visits-sub">in period</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total revenue</div>
+      <div class="metric-value" id="kpi-revenue">—</div>
+      <div class="metric-sub">gross</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Ad spend needed</div>
+      <div class="metric-value" id="kpi-adspend">—</div>
+      <div class="metric-sub" id="kpi-adspend-sub">of paid traffic</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-grid">
+    <div class="card full-card">
+      <div class="card-title">Daily visits by conversion rate</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="chart-conv"></canvas></div>
+    </div>
+    <div class="card full-card">
+      <div class="card-title">Ad budget vs. revenue breakdown</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="chart-revenue"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ROAS -->
+  <div class="card full-card">
+    <div class="card-title">ROAS — Return on Ad Spend</div>
+    <div class="roas-grid">
+      <div class="roas-card roas-bad">
+        <div class="roas-label bad">Break-even ROAS</div>
+        <div class="roas-value bad" id="roas-break">—</div>
+        <div class="roas-sub bad">Minimum to not lose money</div>
+      </div>
+      <div class="roas-card roas-ok">
+        <div class="roas-label ok">Your ROAS</div>
+        <div class="roas-value ok" id="roas-actual">—</div>
+        <div class="roas-sub ok" id="roas-actual-sub">Revenue ÷ Ad spend</div>
+      </div>
+      <div class="roas-card roas-good">
+        <div class="roas-label good">Net profit</div>
+        <div class="roas-value good" id="roas-profit">—</div>
+        <div class="roas-sub good">After COGS & ad spend</div>
+      </div>
+    </div>
+    <div class="insight" id="insight-text">Adjust the sliders above to see your personalised recommendation.</div>
+  </div>
+
+  <!-- CONVERSION TABLE -->
+  <div class="card full-card">
+    <div class="card-title">Scenario comparison — your current settings highlighted</div>
+    <div style="overflow-x:auto">
+      <table class="conv-table" id="conv-table">
+        <thead>
+          <tr>
+            <th>Conv. rate</th>
+            <th>Visits / day</th>
+            <th>Total visits</th>
+            <th>Ad spend (€)</th>
+            <th>Revenue (€)</th>
+            <th>ROAS</th>
+            <th>Net profit (€)</th>
+            <th>Profile</th>
+          </tr>
+        </thead>
+        <tbody id="conv-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>Lisa Hanna Beauty · Traffic Calculator · For planning purposes only</footer>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (n, dec=0) => Number(n.toFixed(dec)).toLocaleString('en-GB', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+const fmtEur = n => '€' + fmt(Math.round(n));
+
+let chartConv, chartRevenue;
+
+const sliders = [
+  ['inp-products', 'val-products', v => fmt(v)],
+  ['inp-ppo',      'val-ppo',      v => v],
+  ['inp-months',   'val-months',   v => v],
+  ['inp-conv',     'val-conv',     v => v + '%'],
+  ['inp-aov',      'val-aov',      v => '€' + v],
+  ['inp-cpc',      'val-cpc',      v => '€' + Number(v).toFixed(2)],
+  ['inp-cogs',     'val-cogs',     v => '€' + v],
+];
+
+sliders.forEach(([id, outId, fmt]) => {
+  $(id).addEventListener('input', () => {
+    $(outId).textContent = fmt($(id).value);
+    update();
+  });
+});
+$('inp-source').addEventListener('change', update);
+
+function getVals() {
+  return {
+    products: +$('inp-products').value,
+    ppo:      +$('inp-ppo').value,
+    months:   +$('inp-months').value,
+    conv:     +$('inp-conv').value / 100,
+    aov:      +$('inp-aov').value,
+    cpc:      +$('inp-cpc').value,
+    cogs:     +$('inp-cogs').value,
+    paidFrac: +$('inp-source').value,
+  };
+}
+
+function calcScenario(v, conv) {
+  const days = v.months * 30;
+  const orders = v.products / v.ppo;
+  const visitsTotal = orders / conv;
+  const visitsDay = visitsTotal / days;
+  const revenue = v.products * v.aov;
+  const paidVisits = visitsTotal * v.paidFrac;
+  const adSpend = paidVisits * v.cpc;
+  const cogs = v.products * v.cogs;
+  const netProfit = revenue - adSpend - cogs;
+  const roas = adSpend > 0 ? revenue / adSpend : Infinity;
+  return { days, orders, visitsTotal, visitsDay, revenue, adSpend, cogs, netProfit, roas };
+}
+
+function pulse(id) {
+  const el = $(id);
+  el.classList.remove('pulse');
+  void el.offsetWidth;
+  el.classList.add('pulse');
+}
+
+function update() {
+  const v = getVals();
+  const s = calcScenario(v, v.conv);
+
+  // KPIs
+  $('kpi-visits-day').textContent   = fmt(Math.round(s.visitsDay));
+  $('kpi-visits-total').textContent = s.visitsTotal >= 1e6 ? fmt(s.visitsTotal/1e6, 1) + 'M' : fmt(Math.round(s.visitsTotal));
+  $('kpi-visits-sub').textContent   = `in ${v.months} month${v.months>1?'s':''}`;
+  $('kpi-revenue').textContent      = s.revenue >= 1e6 ? '€' + fmt(s.revenue/1e6,1)+'M' : fmtEur(s.revenue);
+  $('kpi-adspend').textContent      = s.adSpend >= 1e6 ? '€' + fmt(s.adSpend/1e6,1)+'M' : fmtEur(s.adSpend);
+  $('kpi-adspend-sub').textContent  = v.paidFrac === 0 ? 'Organic only — €0 spend' : `${Math.round(v.paidFrac*100)}% paid traffic`;
+
+  ['kpi-visits-day','kpi-visits-total','kpi-revenue','kpi-adspend'].forEach(pulse);
+
+  // ROAS
+  const breakEven = v.aov / v.cpc;
+  $('roas-break').textContent  = fmt(breakEven, 1) + 'x';
+  $('roas-actual').textContent = s.adSpend > 0 ? fmt(s.roas, 1) + 'x' : '∞';
+  $('roas-profit').textContent = s.netProfit >= 1e6 ? '€'+fmt(s.netProfit/1e6,1)+'M' : fmtEur(s.netProfit);
+
+  // Insight
+  let msg = '';
+  if (v.paidFrac === 0) {
+    msg = `With 100% organic traffic, your ad spend is €0. Focus on SEO, content marketing, and social to drive <strong>${fmt(Math.round(s.visitsDay))} daily visits</strong>. Your net profit after COGS is <strong>${fmtEur(s.netProfit)}</strong>.`;
+  } else if (s.roas < breakEven * 0.7) {
+    msg = `⚠️ Your ROAS of <strong>${fmt(s.roas,1)}x</strong> is below break-even (<strong>${fmt(breakEven,1)}x</strong>). Every sale is losing money. Consider raising AOV, improving conversion rate, or reducing CPC. Increasing to just <strong>2% conversion</strong> would dramatically improve margins.`;
+  } else if (s.roas < breakEven) {
+    msg = `Your ROAS of <strong>${fmt(s.roas,1)}x</strong> is close to break-even. You're covering ad costs but margin is thin after COGS. Try to push conversion above <strong>${fmt(v.conv*100+0.5,1)}%</strong> or raise your average order value.`;
+  } else if (s.roas >= breakEven * 2) {
+    msg = `✨ Excellent! ROAS of <strong>${fmt(s.roas,1)}x</strong> is well above break-even. You're generating <strong>${fmtEur(s.netProfit)}</strong> net profit. Consider scaling ad spend to increase velocity — you have healthy margins.`;
+  } else {
+    msg = `ROAS of <strong>${fmt(s.roas,1)}x</strong> looks healthy. You need <strong>${fmt(Math.round(s.visitsDay))} visits/day</strong> to hit your target. Mix of paid and organic traffic can reduce the <strong>${fmtEur(s.adSpend)}</strong> ad investment.`;
+  }
+  $('insight-text').innerHTML = msg;
+
+  // Scenario table
+  const convRates = [0.005, 0.01, 0.02, 0.03, 0.05, 0.08, 0.10];
+  const badges = [
+    ['Very hard',    'badge-red'],
+    ['Realistic',    'badge-rose'],
+    ['Good',         'badge-rose'],
+    ['Optimised',    'badge-amber'],
+    ['Excellent',    'badge-green'],
+    ['Top 1%',       'badge-green'],
+    ['Elite',        'badge-green'],
+  ];
+  const tbody = $('conv-tbody');
+  tbody.innerHTML = '';
+  convRates.forEach((cr, i) => {
+    const sc = calcScenario(v, cr);
+    const isActive = Math.abs(cr - v.conv) < 0.001;
+    const tr = document.createElement('tr');
+    if (isActive) tr.classList.add('highlight-row');
+    const roasStr = sc.adSpend > 0 ? fmt(sc.roas,1)+'x' : '∞';
+    const profitColor = sc.netProfit >= 0 ? 'var(--green-txt)' : 'var(--red-txt)';
+    tr.innerHTML = `
+      <td><strong>${fmt(cr*100,1)}%</strong></td>
+      <td>${fmt(Math.round(sc.visitsDay))}</td>
+      <td>${sc.visitsTotal>=1e6 ? fmt(sc.visitsTotal/1e6,1)+'M' : fmt(Math.round(sc.visitsTotal))}</td>
+      <td>${sc.adSpend>=1e6 ? '€'+fmt(sc.adSpend/1e6,1)+'M' : fmtEur(sc.adSpend)}</td>
+      <td>${fmtEur(sc.revenue)}</td>
+      <td>${roasStr}</td>
+      <td style="color:${profitColor};font-weight:500">${sc.netProfit>=1e6?'€'+fmt(sc.netProfit/1e6,1)+'M':fmtEur(sc.netProfit)}</td>
+      <td><span class="badge ${badges[i][1]}">${badges[i][0]}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  updateCharts(v);
+}
+
+function updateCharts(v) {
+  // Chart 1: daily visits by conv rate
+  const convRates = [0.5,1,2,3,5,8,10];
+  const days = v.months * 30;
+  const orders = v.products / v.ppo;
+  const visitsData = convRates.map(cr => Math.round(orders / (cr/100) / days));
+  const barColors = convRates.map(cr => Math.abs(cr - v.conv*100) < 0.05 ? '#8B3A5A' : 'rgba(139,58,90,0.25)');
+
+  if (chartConv) {
+    chartConv.data.datasets[0].data = visitsData;
+    chartConv.data.datasets[0].backgroundColor = barColors;
+    chartConv.update('none');
+  } else {
+    chartConv = new Chart($('chart-conv'), {
+      type: 'bar',
+      data: {
+        labels: convRates.map(c => c + '%'),
+        datasets: [{
+          label: 'Visits / day',
+          data: visitsData,
+          backgroundColor: barColors,
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#7A6570', font: { family: 'DM Sans', size: 11 } } },
+          y: { grid: { color: 'rgba(139,58,90,0.06)' }, ticks: { color: '#7A6570', font: { family: 'DM Sans', size: 11 }, callback: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v } }
+        }
+      }
+    });
+  }
+
+  // Chart 2: Revenue breakdown
+  const sc = calcScenario(v, v.conv);
+  const cogsTotal = v.products * v.cogs;
+  const grossProfit = sc.revenue - cogsTotal - sc.adSpend;
+  const labels = ['COGS', 'Ad Spend', 'Net Profit'];
+  const dataVals = [Math.max(0,cogsTotal), Math.max(0,sc.adSpend), Math.max(0,grossProfit)];
+  const colors = ['#C4974A', '#8B3A5A', '#2D6A4F'];
+
+  if (chartRevenue) {
+    chartRevenue.data.datasets[0].data = dataVals;
+    chartRevenue.update('none');
+  } else {
+    chartRevenue = new Chart($('chart-revenue'), {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{ data: dataVals, backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const val = ctx.parsed;
+                const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+                const pct = total > 0 ? ((val/total)*100).toFixed(1) : 0;
+                return ` ${ctx.label}: €${Math.round(val).toLocaleString()} (${pct}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Custom legend for doughnut
+  const legendEl = document.getElementById('chart-legend');
+  if (legendEl) {
+    legendEl.innerHTML = labels.map((l,i) => `
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#7A6570">
+        <span style="width:10px;height:10px;border-radius:2px;background:${colors[i]};flex-shrink:0"></span>
+        ${l}: <strong style="color:#2A1F24">€${Math.round(dataVals[i]).toLocaleString()}</strong>
+      </span>
+    `).join('');
+  }
+}
+
+// Inject legend container after chart
+document.querySelector('#chart-revenue').insertAdjacentHTML('afterend',
+  '<div id="chart-legend" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;justify-content:center"></div>'
+);
+
+update();
+</script>
+</body>
+</html>
