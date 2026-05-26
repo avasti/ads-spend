@@ -8,269 +8,141 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   :root {
-    --rose:       #8B3A5A;
-    --rose-light: #C27A96;
-    --rose-pale:  #F5E8EE;
-    --rose-deep:  #5C1F3A;
-    --gold:       #C4974A;
-    --gold-light: #EDD9B0;
-    --cream:      #FAF6F1;
-    --sand:       #EDE5DA;
-    --charcoal:   #2A1F24;
-    --muted:      #7A6570;
-    --white:      #FFFFFF;
-    --green-bg:   #E8F4EE;
-    --green-txt:  #2D6A4F;
-    --amber-bg:   #FDF3E3;
-    --amber-txt:  #92600A;
-    --red-bg:     #FDECEC;
-    --red-txt:    #8B2020;
+    --rose:#8B3A5A;--rose-light:#C27A96;--rose-pale:#F5E8EE;--rose-deep:#5C1F3A;
+    --gold:#C4974A;--gold-light:#EDD9B0;--cream:#FAF6F1;--sand:#EDE5DA;
+    --charcoal:#2A1F24;--muted:#7A6570;--white:#FFFFFF;
+    --green-bg:#E8F4EE;--green-txt:#2D6A4F;--amber-bg:#FDF3E3;--amber-txt:#92600A;
+    --red-bg:#FDECEC;--red-txt:#8B2020;
   }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream); color: var(--charcoal);
-    min-height: 100vh; overflow-x: hidden;
-  }
-  body::before {
-    content: ''; position: fixed; inset: 0;
-    background-image:
-      radial-gradient(ellipse 80% 60% at 10% 10%, rgba(139,58,90,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 80% at 90% 90%, rgba(196,151,74,0.05) 0%, transparent 60%);
-    pointer-events: none; z-index: 0;
-  }
-  .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-
-  header { text-align: center; padding: 3rem 0 2.5rem; }
-  .brand-tag {
-    display: inline-block; font-size: 10px; font-weight: 500;
-    letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--rose-light); border: 1px solid var(--rose-light);
-    padding: 5px 16px; border-radius: 20px; margin-bottom: 1.2rem;
-  }
-  h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem,5vw,3.4rem); font-weight: 300; color: var(--rose-deep); letter-spacing: -0.01em; line-height: 1.15; }
-  h1 em { font-style: italic; color: var(--rose); }
-  .header-sub { margin-top: 0.75rem; font-size: 14px; color: var(--muted); font-weight: 300; }
-  .divider { width: 60px; height: 1px; background: linear-gradient(90deg,transparent,var(--rose-light),transparent); margin: 1.5rem auto 0; }
-
-  .card { background: var(--white); border-radius: 16px; border: 1px solid rgba(139,58,90,0.10); padding: 1.5rem; box-shadow: 0 2px 20px rgba(44,31,36,0.04); }
-  .card-title { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rose); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; }
-  .card-title::before { content: ''; display: inline-block; width: 18px; height: 1px; background: var(--rose-light); }
-
-  .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-  @media (max-width: 700px) { .grid-inputs { grid-template-columns: 1fr; } }
-  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; min-width: 0; }
-  @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
-  .full-card { margin-bottom: 1.5rem; }
-
-  .input-group { margin-bottom: 1.25rem; }
-  .input-group:last-child { margin-bottom: 0; }
-  .input-label { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline; }
-  .input-label span { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--rose-deep); letter-spacing: 0; text-transform: none; }
-  input[type="range"] { -webkit-appearance: none; width: 100%; height: 3px; background: var(--sand); border-radius: 2px; outline: none; cursor: pointer; margin: 8px 0; }
-  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--rose); border: 3px solid var(--white); box-shadow: 0 0 0 1px var(--rose-light), 0 2px 8px rgba(139,58,90,0.3); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
-  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); box-shadow: 0 0 0 2px var(--rose-light), 0 4px 12px rgba(139,58,90,0.4); }
-  input[type="range"].others-thumb::-webkit-slider-thumb { background: #2D6A4F; box-shadow: 0 0 0 1px #6dbf93, 0 2px 8px rgba(45,106,79,0.3); }
-  .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-  /* TRAFFIC MIX */
-  .mix-section { margin-top: 0.25rem; }
-  .mix-vis-bar { width: 100%; height: 30px; border-radius: 15px; overflow: hidden; display: flex; margin: 0 0 8px; border: 1px solid rgba(139,58,90,0.12); }
-  .mix-paid-seg { background: var(--rose); height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; transition: width 0.2s ease; white-space: nowrap; overflow: hidden; }
-  .mix-oth-seg  { background: #2D6A4F; height: 100%; flex: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; }
-  .mix-pct-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-  .mix-pct-paid { font-size: 11px; font-weight: 500; color: var(--rose); display: flex; align-items: center; gap: 5px; }
-  .mix-pct-oth  { font-size: 11px; font-weight: 500; color: #2D6A4F; display: flex; align-items: center; gap: 5px; }
-  .mix-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .mix-slider-row { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
-  .mix-slider-row .mix-lbl { font-size: 10px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; width: 58px; flex-shrink: 0; }
-  .mix-lbl-paid { color: var(--rose); }
-  .mix-lbl-oth  { color: #2D6A4F; }
-  .mix-slider-row input { flex: 1; margin: 0; }
-  .mix-slider-row .mix-pct { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; width: 38px; text-align: right; flex-shrink: 0; }
-  .mix-pct-v-paid { color: var(--rose-deep); }
-  .mix-pct-v-oth  { color: #2D6A4F; }
-  .mix-note { font-size: 10px; color: var(--muted); text-align: center; margin-top: 6px; }
-
-  /* METRIC CARDS */
-  .metrics-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1.5rem; }
-  @media (max-width: 800px) { .metrics-row { grid-template-columns: repeat(2,1fr); } }
-  .metric-card { background: var(--white); border-radius: 14px; border: 1px solid rgba(139,58,90,0.09); padding: 1.2rem 1.1rem; text-align: center; box-shadow: 0 2px 12px rgba(44,31,36,0.04); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
-  .metric-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,var(--rose),var(--gold)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
-  .metric-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(44,31,36,0.08); }
-  .metric-card:hover::after { transform: scaleX(1); }
-  .metric-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-  .metric-value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: var(--rose-deep); line-height: 1; }
-  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-  .conv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .conv-table th { text-align: left; padding: 10px 14px; background: var(--rose-pale); color: var(--rose-deep); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
-  .conv-table th:first-child { border-radius: 8px 0 0 8px; }
-  .conv-table th:last-child  { border-radius: 0 8px 8px 0; }
-  .conv-table td { padding: 11px 14px; border-bottom: 1px solid rgba(139,58,90,0.06); color: var(--charcoal); }
-  .conv-table tr:hover td { background: rgba(245,232,238,0.4); }
-  .conv-table tr.highlight-row td { background: var(--rose-pale); font-weight: 500; }
-  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 500; letter-spacing: 0.04em; }
-  .badge-green { background: var(--green-bg); color: var(--green-txt); }
-  .badge-amber { background: var(--amber-bg); color: var(--amber-txt); }
-  .badge-red   { background: var(--red-bg);   color: var(--red-txt); }
-  .badge-rose  { background: var(--rose-pale); color: var(--rose-deep); }
-
-  .analysis-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-top: 1rem; }
-  @media (max-width: 700px) { .analysis-grid { grid-template-columns: repeat(2,1fr); } }
-  .an-card { border-radius: 12px; padding: 1rem; text-align: center; transition: transform 0.2s; }
-  .an-card:hover { transform: translateY(-2px); }
-  .an-ok   { background: var(--amber-bg); border: 1px solid rgba(146,96,10,0.15); }
-  .an-good { background: var(--green-bg); border: 1px solid rgba(45,106,79,0.15); }
-  .an-rose { background: var(--rose-pale); border: 1px solid rgba(139,58,90,0.12); }
-  .an-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
-  .an-label.ok   { color: var(--amber-txt); }
-  .an-label.good { color: var(--green-txt); }
-  .an-label.rose { color: var(--rose-deep); }
-  .an-value { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; line-height: 1; }
-  .an-value.ok   { color: var(--amber-txt); }
-  .an-value.good { color: var(--green-txt); }
-  .an-value.rose { color: var(--rose-deep); }
-  .an-sub { font-size: 11px; margin-top: 4px; }
-  .an-sub.ok   { color: var(--amber-txt); }
-  .an-sub.good { color: var(--green-txt); }
-  .an-sub.rose { color: var(--rose-deep); }
-
-  .insight { margin-top: 1.2rem; background: linear-gradient(135deg,var(--rose-pale),var(--gold-light)); border-radius: 12px; padding: 1rem 1.25rem; font-size: 13px; color: var(--rose-deep); line-height: 1.6; border-left: 3px solid var(--rose); }
-  .check-card { border-radius: 12px; padding: 1rem 1.25rem; margin-top: 1rem; font-size: 13px; line-height: 1.6; }
-  .check-ok   { background: var(--green-bg); color: var(--green-txt); border-left: 3px solid var(--green-txt); }
-  .check-warn { background: var(--red-bg);   color: var(--red-txt);   border-left: 3px solid var(--red-txt); }
-
-  .chart-card { overflow: hidden; min-width: 0; }
-  .conv-chart-wrap { position: relative; width: 100%; height: 220px; min-width: 0; }
-
-  .revenue-body { display: flex; align-items: center; gap: 1.5rem; min-width: 0; }
-  .revenue-doughnut-wrap { position: relative; flex: 0 0 160px; width: 160px; height: 160px; }
-  .revenue-legend { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; overflow: hidden; }
-  @media (max-width: 620px) {
-    .revenue-body { flex-direction: column; align-items: center; gap: 1rem; }
-    .revenue-doughnut-wrap { flex: none; width: 160px; height: 160px; }
-    .revenue-legend { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
-  }
-  .rev-legend-item { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .rev-legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-  .rev-legend-lbl { font-size: 11px; color: var(--muted); display: block; white-space: nowrap; }
-  .rev-legend-val { font-size: 15px; font-weight: 500; color: var(--charcoal); display: block; }
-
-  .evolution-wrap { position: relative; width: 100%; height: 300px; }
-  @media (max-width: 700px) { .evolution-wrap { height: 230px; } }
-  .evolution-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px; justify-content: center; }
-  .evo-leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-  .evo-leg-line { width: 22px; height: 2px; border-radius: 2px; flex-shrink: 0; }
-
-  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-  .card, .metric-card { animation: fadeUp 0.5s ease both; }
-  .metric-card:nth-child(1) { animation-delay: 0.05s; }
-  .metric-card:nth-child(2) { animation-delay: 0.10s; }
-  .metric-card:nth-child(3) { animation-delay: 0.15s; }
-  .metric-card:nth-child(4) { animation-delay: 0.20s; }
-  .pulse { animation: pulse 0.3s ease; }
-  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
-
-  footer { text-align: center; padding: 2rem 0 0; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 60% at 10% 10%,rgba(139,58,90,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 90% 90%,rgba(196,151,74,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+  .wrapper{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem}
+  header{text-align:center;padding:3rem 0 2.5rem}
+  .brand-tag{display:inline-block;font-size:10px;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:var(--rose-light);border:1px solid var(--rose-light);padding:5px 16px;border-radius:20px;margin-bottom:1.2rem}
+  h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5vw,3.4rem);font-weight:300;color:var(--rose-deep);letter-spacing:-.01em;line-height:1.15}
+  h1 em{font-style:italic;color:var(--rose)}
+  .header-sub{margin-top:.75rem;font-size:14px;color:var(--muted);font-weight:300}
+  .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--rose-light),transparent);margin:1.5rem auto 0}
+  .card{background:var(--white);border-radius:16px;border:1px solid rgba(139,58,90,.10);padding:1.5rem;box-shadow:0 2px 20px rgba(44,31,36,.04)}
+  .card-title{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--rose);margin-bottom:1.2rem;display:flex;align-items:center;gap:8px}
+  .card-title::before{content:'';display:inline-block;width:18px;height:1px;background:var(--rose-light)}
+  .grid-inputs{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+  @media(max-width:700px){.grid-inputs{grid-template-columns:1fr}}
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;min-width:0}
+  @media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
+  .full-card{margin-bottom:1.5rem}
+  .input-group{margin-bottom:1.25rem}.input-group:last-child{margin-bottom:0}
+  .input-label{font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline}
+  .input-label span{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--rose-deep);letter-spacing:0;text-transform:none}
+  input[type="range"]{-webkit-appearance:none;width:100%;height:3px;background:var(--sand);border-radius:2px;outline:none;cursor:pointer;margin:8px 0}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--rose);border:3px solid var(--white);box-shadow:0 0 0 1px var(--rose-light),0 2px 8px rgba(139,58,90,.3);cursor:pointer;transition:transform .15s,box-shadow .15s}
+  input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 0 0 2px var(--rose-light),0 4px 12px rgba(139,58,90,.4)}
+  input[type="range"].others-thumb::-webkit-slider-thumb{background:#2D6A4F;box-shadow:0 0 0 1px #6dbf93,0 2px 8px rgba(45,106,79,.3)}
+  .range-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px}
+  .metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+  @media(max-width:800px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
+  .metric-card{background:var(--white);border-radius:14px;border:1px solid rgba(139,58,90,.09);padding:1.2rem 1.1rem;text-align:center;box-shadow:0 2px 12px rgba(44,31,36,.04);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+  .metric-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rose),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+  .metric-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(44,31,36,.08)}
+  .metric-card:hover::after{transform:scaleX(1)}
+  .metric-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .metric-value{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--rose-deep);line-height:1}
+  .metric-sub{font-size:11px;color:var(--muted);margin-top:4px}
+  .conv-table{width:100%;border-collapse:collapse;font-size:13px}
+  .conv-table th{text-align:left;padding:10px 14px;background:var(--rose-pale);color:var(--rose-deep);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+  .conv-table th:first-child{border-radius:8px 0 0 8px}.conv-table th:last-child{border-radius:0 8px 8px 0}
+  .conv-table td{padding:11px 14px;border-bottom:1px solid rgba(139,58,90,.06);color:var(--charcoal)}
+  .conv-table tr:hover td{background:rgba(245,232,238,.4)}
+  .conv-table tr.highlight-row td{background:var(--rose-pale);font-weight:500}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:.04em}
+  .badge-green{background:var(--green-bg);color:var(--green-txt)}.badge-amber{background:var(--amber-bg);color:var(--amber-txt)}.badge-red{background:var(--red-bg);color:var(--red-txt)}
+  .analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1rem}
+  @media(max-width:700px){.analysis-grid{grid-template-columns:repeat(2,1fr)}}
+  .an-card{border-radius:12px;padding:1rem;text-align:center;transition:transform .2s}.an-card:hover{transform:translateY(-2px)}
+  .an-ok{background:var(--amber-bg);border:1px solid rgba(146,96,10,.15)}
+  .an-good{background:var(--green-bg);border:1px solid rgba(45,106,79,.15)}
+  .an-rose{background:var(--rose-pale);border:1px solid rgba(139,58,90,.12)}
+  .an-label{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .an-label.ok{color:var(--amber-txt)}.an-label.good{color:var(--green-txt)}.an-label.rose{color:var(--rose-deep)}
+  .an-value{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;line-height:1}
+  .an-value.ok{color:var(--amber-txt)}.an-value.good{color:var(--green-txt)}.an-value.rose{color:var(--rose-deep)}
+  .an-sub{font-size:11px;margin-top:4px}.an-sub.ok{color:var(--amber-txt)}.an-sub.good{color:var(--green-txt)}.an-sub.rose{color:var(--rose-deep)}
+  .insight{margin-top:1.2rem;background:linear-gradient(135deg,var(--rose-pale),var(--gold-light));border-radius:12px;padding:1rem 1.25rem;font-size:13px;color:var(--rose-deep);line-height:1.6;border-left:3px solid var(--rose)}
+  .check-card{border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;font-size:13px;line-height:1.6}
+  .check-ok{background:var(--green-bg);color:var(--green-txt);border-left:3px solid var(--green-txt)}
+  .check-warn{background:var(--red-bg);color:var(--red-txt);border-left:3px solid var(--red-txt)}
+  .chart-card{overflow:hidden;min-width:0}
+  .conv-chart-wrap{position:relative;width:100%;height:220px;min-width:0}
+  .revenue-body{display:flex;align-items:center;gap:1.5rem;min-width:0}
+  .revenue-doughnut-wrap{position:relative;flex:0 0 160px;width:160px;height:160px}
+  .revenue-legend{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0;overflow:hidden}
+  @media(max-width:620px){.revenue-body{flex-direction:column;align-items:center;gap:1rem}.revenue-doughnut-wrap{flex:none;width:160px;height:160px}.revenue-legend{width:100%;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:10px}}
+  .rev-legend-item{display:flex;align-items:center;gap:10px;min-width:0}
+  .rev-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+  .rev-legend-lbl{font-size:11px;color:var(--muted);display:block;white-space:nowrap}
+  .rev-legend-val{font-size:15px;font-weight:500;color:var(--charcoal);display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .card,.metric-card{animation:fadeUp .5s ease both}
+  .metric-card:nth-child(1){animation-delay:.05s}.metric-card:nth-child(2){animation-delay:.10s}.metric-card:nth-child(3){animation-delay:.15s}.metric-card:nth-child(4){animation-delay:.20s}
+  .pulse{animation:pulse .3s ease}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+  footer{text-align:center;padding:2rem 0 0;font-size:11px;color:var(--muted);letter-spacing:.05em}
 </style>
 </head>
 <body>
 <div class="wrapper">
-
   <header>
     <div class="brand-tag">Lisa Hanna Beauty</div>
     <h1>Ad Spend <em>Calculator</em></h1>
-    <p class="header-sub">How many products do you want to sell? See exactly how much to invest.</p>
+    <p class="header-sub">Set your monthly order goal — see exactly how much to invest.</p>
     <div class="divider"></div>
   </header>
 
-  <!-- INPUTS -->
   <div class="grid-inputs">
-
     <div class="card">
       <div class="card-title">Sales Goal</div>
       <div class="input-group">
-        <div class="input-label">Products to sell <span id="val-products">66,000</span></div>
-        <input type="range" id="inp-products" min="100" max="200000" step="100" value="66000">
-        <div class="range-labels"><span>100</span><span>200K</span></div>
+        <div class="input-label">Orders / month (total) <span id="val-opm">2,000</span></div>
+        <input type="range" id="inp-opm" min="10" max="20000" step="10" value="2000">
+        <div class="range-labels"><span>10</span><span>20K</span></div>
       </div>
       <div class="input-group">
-        <div class="input-label">Products per order <span id="val-ppo">1</span></div>
-        <input type="range" id="inp-ppo" min="1" max="10" step="1" value="1">
-        <div class="range-labels"><span>1</span><span>10</span></div>
+        <div class="input-label">Orders from other channels / month <span id="val-oth">600</span></div>
+        <input type="range" class="others-thumb" id="inp-oth" min="0" max="20000" step="10" value="600">
+        <div class="range-labels"><span>0</span><span>20K</span></div>
       </div>
       <div class="input-group">
         <div class="input-label">Time period (months) <span id="val-months">12</span></div>
         <input type="range" id="inp-months" min="1" max="24" step="1" value="12">
         <div class="range-labels"><span>1m</span><span>24m</span></div>
       </div>
-
-      <!-- TRAFFIC MIX -->
-      <div class="input-group mix-section" style="margin-bottom:0">
-        <div class="input-label" style="margin-bottom:8px">Sales channel mix</div>
-
-        <div class="mix-vis-bar">
-          <div class="mix-paid-seg" id="mix-bar-paid">Paid Ads 70%</div>
-          <div class="mix-oth-seg"  id="mix-bar-oth">Others 30%</div>
-        </div>
-
-        <div class="mix-pct-row">
-          <span class="mix-pct-paid"><span class="mix-dot" style="background:var(--rose)"></span>Paid Ads · <strong id="mix-lbl-paid">70%</strong></span>
-          <span class="mix-pct-oth"><span class="mix-dot" style="background:#2D6A4F"></span>Others · <strong id="mix-lbl-oth">30%</strong></span>
-        </div>
-
-        <div class="mix-slider-row">
-          <span class="mix-lbl mix-lbl-paid">Paid</span>
-          <input type="range" id="inp-paid" min="0" max="100" step="5" value="70">
-          <span class="mix-pct mix-pct-v-paid" id="val-paid">70%</span>
-        </div>
-        <div class="mix-slider-row">
-          <span class="mix-lbl mix-lbl-oth">Others</span>
-          <input type="range" class="others-thumb" id="inp-others" min="0" max="100" step="5" value="30">
-          <span class="mix-pct mix-pct-v-oth" id="val-others">30%</span>
-        </div>
-
-        <div class="mix-note">Sliders are linked · total always = 100%</div>
-      </div>
     </div>
 
     <div class="card">
-      <div class="card-title">Ads & Traffic Metrics</div>
+      <div class="card-title">Metrics</div>
       <div class="input-group">
         <div class="input-label">Avg. order value — AOV ($) <span id="val-aov">170</span></div>
         <input type="range" id="inp-aov" min="5" max="500" step="5" value="170">
         <div class="range-labels"><span>$5</span><span>$500</span></div>
       </div>
       <div class="input-group">
-        <div class="input-label">Cost per result — CPR ($) <span id="val-cpr">7</span></div>
-        <input type="range" id="inp-cpr" min="1" max="200" step="1" value="7">
-        <div class="range-labels"><span>$1</span><span>$200</span></div>
-      </div>
-      <div class="input-group">
-        <div class="input-label">Target ROAS <span id="val-roas">3.0x</span></div>
-        <input type="range" id="inp-roas" min="1" max="20" step="0.5" value="3">
-        <div class="range-labels"><span>1x</span><span>20x</span></div>
-      </div>
-      <div class="input-group">
-        <div class="input-label">Others conversion rate <span id="val-cvr">2.0%</span></div>
-        <input type="range" class="others-thumb" id="inp-cvr" min="0.1" max="10" step="0.1" value="2">
-        <div class="range-labels"><span>0.1%</span><span>10%</span></div>
+        <div class="input-label">Target ROAS <span id="val-roas">4.0x</span></div>
+        <input type="range" id="inp-roas" min="1" max="10" step="0.5" value="4">
+        <div class="range-labels"><span>1x</span><span>10x</span></div>
       </div>
     </div>
   </div>
 
-  <!-- KPI METRICS -->
   <div class="metrics-row">
     <div class="metric-card">
-      <div class="metric-label">Ad Spend Needed</div>
-      <div class="metric-value" id="kpi-adspend">—</div>
-      <div class="metric-sub" id="kpi-adspend-sub">paid ads investment</div>
+      <div class="metric-label">Ad Spend / month</div>
+      <div class="metric-value" id="kpi-monthly">—</div>
+      <div class="metric-sub" id="kpi-monthly-sub">monthly budget</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">Ad spend / month</div>
-      <div class="metric-value" id="kpi-monthly">—</div>
-      <div class="metric-sub">monthly budget</div>
+      <div class="metric-label">Total Ad Spend</div>
+      <div class="metric-value" id="kpi-adspend">—</div>
+      <div class="metric-sub" id="kpi-adspend-sub">full period</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Total Revenue</div>
@@ -278,87 +150,65 @@
       <div class="metric-sub" id="kpi-revenue-sub">all channels</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">Others visits / day</div>
-      <div class="metric-value" id="kpi-othvisits">—</div>
-      <div class="metric-sub" id="kpi-othvisits-sub">organic traffic needed</div>
+      <div class="metric-label">Paid Revenue</div>
+      <div class="metric-value" id="kpi-paidrev">—</div>
+      <div class="metric-sub" id="kpi-paidrev-sub">total period</div>
     </div>
   </div>
 
-  <!-- CHARTS ROW -->
   <div class="charts-grid">
-
     <div class="card chart-card">
       <div class="card-title">Ad spend by ROAS target</div>
-      <div class="conv-chart-wrap">
-        <canvas id="chart-roas"></canvas>
-      </div>
+      <div class="conv-chart-wrap"><canvas id="chart-roas"></canvas></div>
     </div>
-
     <div class="card chart-card">
       <div class="card-title">Revenue breakdown</div>
       <div class="revenue-body">
-        <div class="revenue-doughnut-wrap">
-          <canvas id="chart-revenue"></canvas>
-        </div>
+        <div class="revenue-doughnut-wrap"><canvas id="chart-revenue"></canvas></div>
         <div class="revenue-legend" id="revenue-legend"></div>
       </div>
     </div>
-
   </div>
 
-  <!-- MONTHLY EVOLUTION CHART -->
-  <div class="card full-card">
-    <div class="card-title">Monthly cumulative projection</div>
-    <div class="evolution-wrap">
-      <canvas id="chart-evolution"></canvas>
-    </div>
-    <div class="evolution-legend" id="evolution-legend"></div>
-  </div>
-
-  <!-- ANALYSIS -->
   <div class="card full-card">
     <div class="card-title">Analysis</div>
     <div class="analysis-grid">
       <div class="an-card an-ok">
         <div class="an-label ok">Target ROAS</div>
         <div class="an-value ok" id="an-roas">—</div>
-        <div class="an-sub ok">Paid ads goal</div>
+        <div class="an-sub ok">Your goal</div>
       </div>
       <div class="an-card an-rose">
-        <div class="an-label rose">Max CPR allowed</div>
-        <div class="an-value rose" id="an-maxcpr">—</div>
-        <div class="an-sub rose">To hit ROAS target</div>
+        <div class="an-label rose">Paid orders (total)</div>
+        <div class="an-value rose" id="an-paidorders">—</div>
+        <div class="an-sub rose">Covered by ads</div>
       </div>
       <div class="an-card an-good">
-        <div class="an-label good">Net return (paid)</div>
-        <div class="an-value good" id="an-netreturn">—</div>
-        <div class="an-sub good">Paid revenue − Ad spend</div>
+        <div class="an-label good" id="an-paidrev-label">Paid revenue (total 12 months)</div>
+        <div class="an-value good" id="an-paidrev">—</div>
+        <div class="an-sub good">Revenue from paid ads</div>
       </div>
       <div class="an-card an-good">
-        <div class="an-label good">Others revenue</div>
+        <div class="an-label good" id="an-othrevenue-label">Others revenue (total 12 months)</div>
         <div class="an-value good" id="an-othrevenue">—</div>
         <div class="an-sub good">No ad cost</div>
       </div>
     </div>
-    <div id="cpr-check"></div>
+    <div id="roas-check"></div>
     <div class="insight" id="insight-text"></div>
   </div>
 
-  <!-- SCENARIO TABLE -->
   <div class="card full-card">
     <div class="card-title">ROAS scenarios — your target highlighted</div>
     <div style="overflow-x:auto">
       <table class="conv-table">
-        <thead>
-          <tr>
-            <th>ROAS</th>
-            <th>Ad Spend ($)</th>
-            <th>Monthly ($)</th>
-            <th>Max CPR ($)</th>
-            <th>Paid Net ($)</th>
-            <th>Verdict</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>ROAS</th>
+          <th>Ad Spend / mo</th>
+          <th>Total Ad Spend</th>
+          <th id="th-paidrev">Paid Revenue (12 months)</th>
+          <th>Verdict</th>
+        </tr></thead>
         <tbody id="scenario-tbody"></tbody>
       </table>
     </div>
@@ -369,185 +219,127 @@
 
 <script>
 const $ = id => document.getElementById(id);
-const fmt   = (n, dec=0) => Number(n.toFixed(dec)).toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec});
-const fmtUsd = n => '$' + fmt(Math.round(n));
-const fmtK   = n => {
-  if (Math.abs(n) >= 1e6) return (n < 0 ? '-$' : '$') + fmt(Math.abs(n)/1e6, 1) + 'M';
-  if (Math.abs(n) >= 1e4) return (n < 0 ? '-$' : '$') + fmt(Math.abs(n)/1000, 1) + 'K';
+const fmt = (n,dec=0) => Number(n.toFixed(dec)).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+const fmtUsd = n => '$'+fmt(Math.round(n));
+const fmtK = n => {
+  if(Math.abs(n)>=1e6) return (n<0?'-$':'$')+fmt(Math.abs(n)/1e6,1)+'M';
+  if(Math.abs(n)>=1e4) return (n<0?'-$':'$')+fmt(Math.abs(n)/1000,1)+'K';
   return fmtUsd(n);
 };
-const fmtNum = n => {
-  if (n >= 1e6) return fmt(n/1e6,1)+'M';
-  if (n >= 1e4) return fmt(n/1000,1)+'K';
-  return fmt(Math.round(n));
-};
+const fmtNum = n => { if(n>=1e6) return fmt(n/1e6,1)+'M'; if(n>=1e4) return fmt(n/1000,1)+'K'; return fmt(Math.round(n)); };
+let chartRoas, chartRevenue;
 
-let chartRoas, chartRevenue, chartEvolution;
-
-// ── SLIDERS ──
 const sliders = [
-  ['inp-products','val-products', v => fmtNum(+v)],
-  ['inp-ppo',     'val-ppo',      v => v],
-  ['inp-months',  'val-months',   v => v],
-  ['inp-aov',     'val-aov',      v => '$'+v],
-  ['inp-cpr',     'val-cpr',      v => '$'+v],
-  ['inp-roas',    'val-roas',     v => Number(v).toFixed(1)+'x'],
-  ['inp-cvr',     'val-cvr',      v => Number(v).toFixed(1)+'%'],
+  ['inp-opm','val-opm',v=>fmtNum(+v)],
+  ['inp-oth','val-oth',v=>fmtNum(+v)],
+  ['inp-months','val-months',v=>v],
+  ['inp-aov','val-aov',v=>'$'+v],
+  ['inp-roas','val-roas',v=>Number(v).toFixed(1)+'x'],
 ];
 sliders.forEach(([id,outId,fn]) => {
-  $(id).addEventListener('input', () => { $(outId).textContent = fn($(id).value); update(); });
+  $(id).addEventListener('input', () => {
+    $(outId).textContent = fn($(id).value);
+    if (id==='inp-opm'||id==='inp-oth') {
+      const total = +$('inp-opm').value, oth = +$('inp-oth').value;
+      if (oth > total) { $('inp-oth').value = total; $('val-oth').textContent = fmtNum(total); }
+    }
+    update();
+  });
 });
 
-// ── TRAFFIC MIX — linked sliders ──
-let lockMix = false;
-function syncMix(changedId) {
-  if (lockMix) return;
-  lockMix = true;
-  const p = changedId === 'inp-paid' ? +$('inp-paid').value : 100 - +$('inp-others').value;
-  const o = 100 - p;
-  $('inp-paid').value    = p;
-  $('inp-others').value  = o;
-  renderMixUI(p, o);
-  lockMix = false;
-  update();
-}
-$('inp-paid').addEventListener('input',   () => syncMix('inp-paid'));
-$('inp-others').addEventListener('input', () => syncMix('inp-others'));
-
-function renderMixUI(p, o) {
-  $('val-paid').textContent    = p + '%';
-  $('val-others').textContent  = o + '%';
-  $('mix-lbl-paid').textContent = p + '%';
-  $('mix-lbl-oth').textContent  = o + '%';
-  const paidBar = $('mix-bar-paid');
-  const othBar  = $('mix-bar-oth');
-  paidBar.style.width = p + '%';
-  paidBar.textContent = p >= 20 ? 'Paid Ads ' + p + '%' : (p >= 10 ? p + '%' : '');
-  othBar.textContent  = o >= 20 ? 'Others ' + o + '%' : (o >= 10 ? o + '%' : '');
-}
-
 function getVals() {
-  const p = +$('inp-paid').value / 100;
+  const opm = +$('inp-opm').value;
+  const oth = Math.min(+$('inp-oth').value, opm);
   return {
-    products:   +$('inp-products').value,
-    ppo:        +$('inp-ppo').value,
-    months:     +$('inp-months').value,
-    aov:        +$('inp-aov').value,
-    cpr:        +$('inp-cpr').value,
-    targetRoas: +$('inp-roas').value,
-    cvr:        +$('inp-cvr').value / 100,
-    paidFrac:   p,
-    othFrac:    1 - p,
+    opm, othPerMonth: oth, paidPerMonth: opm - oth,
+    months: +$('inp-months').value,
+    aov: +$('inp-aov').value, targetRoas: +$('inp-roas').value,
   };
 }
 
-// Core formulas:
-//   orders       = products / ppo
-//   paidOrders   = orders × paidFrac
-//   othOrders    = orders × othFrac
-//   revenue      = orders × AOV
-//   paidRevenue  = paidOrders × AOV
-//   othRevenue   = othOrders × AOV
-//   adSpend      = paidRevenue / targetRoas
-//   maxCpr       = adSpend / paidOrders
-//   adSpendCpr   = paidOrders × CPR  (actual spend at current CPR)
-//   realRoas     = paidRevenue / adSpendCpr
-//   paidNet      = paidRevenue - adSpend
-//   othVisits    = othOrders / cvr
-//   othVisitsDay = othVisits / days
+// ROAS-driven formulas:
+//   paidOrders  = paidPerMonth × months
+//   othOrders   = othPerMonth × months
+//   paidRevenue = paidOrders × AOV
+//   othRevenue  = othOrders × AOV
+//   adSpend     = paidRevenue / ROAS
+//   paidNet     = paidRevenue - adSpend
 function calc(v, roas) {
-  const days         = v.months * 30;
-  const orders       = v.products / v.ppo;
-  const paidOrders   = orders * v.paidFrac;
-  const othOrders    = orders * v.othFrac;
-  const revenue      = orders * v.aov;
-  const paidRevenue  = paidOrders * v.aov;
-  const othRevenue   = othOrders * v.aov;
-  const adSpend      = roas > 0 ? paidRevenue / roas : 0;
-  const monthly      = adSpend / v.months;
-  const maxCpr       = paidOrders > 0 ? adSpend / paidOrders : 0;
-  const adSpendCpr   = paidOrders * v.cpr;
-  const realRoas     = adSpendCpr > 0 ? paidRevenue / adSpendCpr : Infinity;
-  const paidNet      = paidRevenue - adSpend;
-  const othVisits    = v.cvr > 0 ? othOrders / v.cvr : 0;
-  const othVisitsDay = days > 0 ? othVisits / days : 0;
-  return { orders, paidOrders, othOrders, revenue, paidRevenue, othRevenue, adSpend, monthly, maxCpr, adSpendCpr, realRoas, paidNet, othVisits, othVisitsDay };
+  const paidOrders  = v.paidPerMonth * v.months;
+  const othOrders   = v.othPerMonth * v.months;
+  const orders      = paidOrders + othOrders;
+  const paidRevenue = paidOrders * v.aov;
+  const othRevenue  = othOrders * v.aov;
+  const revenue     = orders * v.aov;
+  const adSpend     = roas > 0 ? paidRevenue / roas : 0;
+  const monthly     = v.months > 0 ? adSpend / v.months : 0;
+  const paidNet     = paidRevenue - adSpend;
+  return { orders, paidOrders, othOrders, revenue, paidRevenue, othRevenue, adSpend, monthly, paidNet };
 }
 
-function pulse(id) {
-  const el = $(id); el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
-}
+function pulse(id) { const el=$(id); el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
 
 function update() {
   const v = getVals();
   const s = calc(v, v.targetRoas);
 
   // KPIs
-  $('kpi-adspend').textContent     = fmtK(s.adSpend);
-  $('kpi-adspend-sub').textContent = `for ${fmtNum(s.paidOrders)} paid orders`;
-  $('kpi-monthly').textContent     = fmtK(s.monthly);
-  $('kpi-revenue').textContent     = fmtK(s.revenue);
-  $('kpi-revenue-sub').textContent = `${fmtNum(v.products)} products · ${fmtNum(s.orders)} orders`;
+  $('kpi-monthly').textContent = fmtK(s.monthly);
+  $('kpi-monthly-sub').textContent = `${fmtNum(v.paidPerMonth)} paid orders/mo at ${fmt(v.targetRoas,1)}x`;
+  $('kpi-adspend').textContent = fmtK(s.adSpend);
+  $('kpi-adspend-sub').textContent = `${fmtNum(s.paidOrders)} paid orders · ${v.months}mo`;
+  $('kpi-revenue').textContent = fmtK(s.revenue);
+  $('kpi-revenue-sub').textContent = `${fmtNum(s.orders)} orders · ${fmtUsd(v.aov)} AOV`;
 
-  if (v.othFrac > 0) {
-    $('kpi-othvisits').textContent    = fmtNum(s.othVisitsDay);
-    $('kpi-othvisits-sub').textContent = `${fmtNum(s.othOrders)} orders via others`;
-  } else {
-    $('kpi-othvisits').textContent    = '—';
-    $('kpi-othvisits-sub').textContent = '100% paid ads';
-  }
-  ['kpi-adspend','kpi-monthly','kpi-revenue','kpi-othvisits'].forEach(pulse);
+  $('kpi-paidrev').textContent = fmtK(s.paidRevenue);
+  $('kpi-paidrev-sub').textContent = `${fmtNum(s.paidOrders)} paid orders · ${v.months}mo`;
+  ['kpi-monthly','kpi-adspend','kpi-revenue','kpi-paidrev'].forEach(pulse);
 
   // Analysis cards
-  $('an-roas').textContent       = fmt(v.targetRoas,1) + 'x';
-  $('an-maxcpr').textContent     = fmtUsd(s.maxCpr);
-  $('an-netreturn').textContent  = fmtK(s.paidNet);
+  $('an-roas').textContent = fmt(v.targetRoas,1)+'x';
+  $('an-paidorders').textContent = fmtNum(s.paidOrders);
+  $('an-paidrev').textContent = fmtK(s.paidRevenue);
+  $('an-paidrev-label').textContent = `Paid revenue (total ${v.months} month${v.months>1?'s':''})`;
   $('an-othrevenue').textContent = fmtK(s.othRevenue);
+  $('an-othrevenue-label').textContent = `Others revenue (total ${v.months} month${v.months>1?'s':''})`;
 
-  // CPR reality check
-  const checkEl = $('cpr-check');
-  if (v.paidFrac === 0) {
+  // ROAS context for luxury skincare
+  const checkEl = $('roas-check');
+  if (v.paidPerMonth === 0) {
     checkEl.className = 'check-card check-ok';
-    checkEl.innerHTML = `100% of sales come from other channels — no ad spend needed.`;
+    checkEl.innerHTML = `All orders come from other channels — no ad spend needed.`;
+  } else if (v.targetRoas >= 5) {
+    checkEl.className = 'check-card check-ok';
+    checkEl.innerHTML = `✨ A ${fmt(v.targetRoas,1)}x ROAS is at the top end for luxury skincare. Monthly ad budget: <strong>${fmtK(s.monthly)}</strong>. Excellent efficiency — every dollar generates $${fmt(v.targetRoas,1)} in revenue.`;
+  } else if (v.targetRoas >= 3) {
+    checkEl.className = 'check-card check-ok';
+    checkEl.innerHTML = `✓ A ${fmt(v.targetRoas,1)}x ROAS is solid for luxury skincare (typical range: 2x–5x). Monthly ad budget: <strong>${fmtK(s.monthly)}</strong>. Paid revenue over the full period: <strong>${fmtK(s.paidRevenue)}</strong>.`;
+  } else if (v.targetRoas >= 2) {
+    checkEl.className = 'check-card check-warn';
+    checkEl.innerHTML = `⚠️ A ${fmt(v.targetRoas,1)}x ROAS is at the lower end for luxury skincare. Monthly budget: <strong>${fmtK(s.monthly)}</strong>. Margins are thin — try to optimize campaigns or increase AOV to push ROAS higher.`;
   } else {
-    const cprOk = v.cpr <= s.maxCpr;
-    if (cprOk) {
-      checkEl.className = 'check-card check-ok';
-      checkEl.innerHTML = `✓ Your current CPR of <strong>${fmtUsd(v.cpr)}</strong> is within budget. To hit ${fmt(v.targetRoas,1)}x ROAS you can spend up to <strong>${fmtUsd(s.maxCpr)}</strong> per result. At your current CPR, your actual ROAS would be <strong>${fmt(s.realRoas,1)}x</strong>.`;
-    } else {
-      checkEl.className = 'check-card check-warn';
-      checkEl.innerHTML = `⚠️ Your current CPR of <strong>${fmtUsd(v.cpr)}</strong> is too high for a ${fmt(v.targetRoas,1)}x ROAS. You'd need a CPR of <strong>${fmtUsd(s.maxCpr)}</strong> or less. At your current CPR, you'd actually get <strong>${fmt(s.realRoas,1)}x</strong> ROAS and spend <strong>${fmtK(s.adSpendCpr)}</strong>.`;
-    }
+    checkEl.className = 'check-card check-warn';
+    checkEl.innerHTML = `⚠️ A ${fmt(v.targetRoas,1)}x ROAS means you're spending more on ads than you generate in revenue. This is unsustainable — aim for at least 2x ROAS for luxury skincare.`;
   }
 
   // Insight
-  const paidPct = Math.round(v.paidFrac * 100);
-  const othPct  = Math.round(v.othFrac * 100);
   let msg = '';
-  if (v.paidFrac === 0) {
-    msg = `All <strong>${fmtNum(v.products)} products</strong> come from other channels. You need <strong>${fmtNum(s.othVisitsDay)} visits/day</strong> at ${fmt(v.cvr*100,1)}% CVR to generate <strong>${fmtNum(s.othOrders)} orders</strong>. Total revenue: <strong>${fmtK(s.revenue)}</strong> with no ad spend.`;
-  } else if (v.othFrac === 0) {
-    msg = `To sell <strong>${fmtNum(v.products)} products</strong> entirely via paid ads at ${fmt(v.targetRoas,1)}x ROAS, invest <strong>${fmtK(s.adSpend)}</strong> (<strong>${fmtK(s.monthly)}/mo</strong>). Max CPR to stay on target: <strong>${fmtUsd(s.maxCpr)}</strong>.`;
+  if (v.paidPerMonth === 0) {
+    msg = `All <strong>${fmtNum(v.opm)} orders/mo</strong> come from other channels. Total revenue: <strong>${fmtK(s.revenue)}</strong> over ${v.months} month${v.months>1?'s':''} with no ad spend.`;
+  } else if (v.othPerMonth === 0) {
+    msg = `To achieve <strong>${fmtNum(v.opm)} orders/mo</strong> entirely via paid ads at <strong>${fmt(v.targetRoas,1)}x ROAS</strong>, invest <strong>${fmtK(s.monthly)}/mo</strong> (<strong>${fmtK(s.adSpend)}</strong> over ${v.months} month${v.months>1?'s':''}). Paid revenue for the full period: <strong>${fmtK(s.paidRevenue)}</strong>.`;
   } else {
-    msg = `To sell <strong>${fmtNum(v.products)} products</strong> in ${v.months} month${v.months>1?'s':''}:<br>
-    <strong>· Paid Ads (${paidPct}%):</strong> ${fmtNum(s.paidOrders)} orders → invest <strong>${fmtK(s.adSpend)}</strong> (<strong>${fmtK(s.monthly)}/mo</strong>) at ${fmt(v.targetRoas,1)}x ROAS. Max CPR: <strong>${fmtUsd(s.maxCpr)}</strong>.<br>
-    <strong>· Others (${othPct}%):</strong> ${fmtNum(s.othOrders)} orders → you need <strong>${fmtNum(s.othVisitsDay)} visits/day</strong> at ${fmt(v.cvr*100,1)}% CVR. Revenue: <strong>${fmtK(s.othRevenue)}</strong> with no ad cost.`;
+    const paidPct = Math.round(v.paidPerMonth / v.opm * 100);
+    const othPct = 100 - paidPct;
+    msg = `To achieve <strong>${fmtNum(v.opm)} orders/mo</strong> over ${v.months} month${v.months>1?'s':''} (${fmtNum(s.orders)} total):<br>
+    <strong>· Paid Ads (${paidPct}%):</strong> ${fmtNum(v.paidPerMonth)}/mo → invest <strong>${fmtK(s.monthly)}/mo</strong> (<strong>${fmtK(s.adSpend)}</strong> total) at ${fmt(v.targetRoas,1)}x ROAS. Paid revenue for the full period: <strong>${fmtK(s.paidRevenue)}</strong>.<br>
+    <strong>· Other Channels (${othPct}%):</strong> ${fmtNum(v.othPerMonth)}/mo → Revenue for the full period: <strong>${fmtK(s.othRevenue)}</strong> with no ad cost.`;
   }
   $('insight-text').innerHTML = msg;
 
   // Scenario table
-  const roasLevels = [1.5, 2, 3, 4, 5, 6, 8, 10, 15];
-  const badges = {
-    1.5: ['Thin margin','badge-red'],
-    2:   ['Low','badge-red'],
-    3:   ['Acceptable','badge-amber'],
-    4:   ['Good','badge-amber'],
-    5:   ['Strong','badge-green'],
-    6:   ['Very strong','badge-green'],
-    8:   ['Excellent','badge-green'],
-    10:  ['Outstanding','badge-green'],
-    15:  ['Elite','badge-green'],
-  };
+  $('th-paidrev').textContent = `Paid Revenue (${v.months} month${v.months>1?'s':''})`;
+  const roasLevels = [1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
   const tbody = $('scenario-tbody');
   tbody.innerHTML = '';
   roasLevels.forEach(r => {
@@ -555,16 +347,18 @@ function update() {
     const isActive = Math.abs(r - v.targetRoas) < 0.01;
     const tr = document.createElement('tr');
     if (isActive) tr.classList.add('highlight-row');
-    const returnColor = sc.paidNet >= 0 ? 'var(--green-txt)' : 'var(--red-txt)';
-    const cprColor    = v.cpr <= sc.maxCpr ? 'var(--green-txt)' : 'var(--red-txt)';
-    const b = badges[r];
+    const returnColor = 'var(--green-txt)';
+    let badge, bClass;
+    if (r >= 4.5)    { badge='Excellent'; bClass='badge-green'; }
+    else if (r >= 3) { badge='Good';      bClass='badge-green'; }
+    else if (r >= 2) { badge='Acceptable'; bClass='badge-amber'; }
+    else             { badge='Thin';       bClass='badge-red'; }
     tr.innerHTML = `
       <td><strong>${fmt(r,1)}x</strong></td>
-      <td>${fmtK(sc.adSpend)}</td>
       <td>${fmtK(sc.monthly)}</td>
-      <td style="color:${cprColor};font-weight:500">${fmtUsd(sc.maxCpr)}</td>
-      <td style="color:${returnColor};font-weight:500">${fmtK(sc.paidNet)}</td>
-      <td><span class="badge ${b[1]}">${b[0]}</span></td>
+      <td>${fmtK(sc.adSpend)}</td>
+      <td style="color:${returnColor};font-weight:500">${fmtK(sc.paidRevenue)}</td>
+      <td><span class="badge ${bClass}">${badge}</span></td>
     `;
     tbody.appendChild(tr);
   });
@@ -572,164 +366,36 @@ function update() {
   updateCharts(v, s);
 }
 
-// ── CHARTS ──
-function updateCharts(v, s) {
-  buildRoasChart(v);
-  buildRevenueChart(v, s);
-  buildEvolutionChart(v);
-}
+function updateCharts(v, s) { buildRoasChart(v); buildRevenueChart(v, s); }
 
 function buildRoasChart(v) {
-  const roasLevels = [2, 3, 4, 5, 6, 8, 10];
-  const orders  = v.products / v.ppo;
-  const paidRev = orders * v.paidFrac * v.aov;
-  const data    = roasLevels.map(r => Math.round(paidRev / r));
-  const colors  = roasLevels.map(r => Math.abs(r - v.targetRoas) < 0.01 ? '#8B3A5A' : 'rgba(139,58,90,0.22)');
-
-  if (chartRoas) {
-    chartRoas.data.datasets[0].data = data;
-    chartRoas.data.datasets[0].backgroundColor = colors;
-    chartRoas.update('none');
-    return;
-  }
+  const roasLevels = [1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+  const paidRev = v.paidPerMonth * v.months * v.aov;
+  const data = roasLevels.map(r => Math.round(paidRev / r));
+  const colors = roasLevels.map(r => Math.abs(r - v.targetRoas) < 0.01 ? '#8B3A5A' : 'rgba(139,58,90,.22)');
+  if (chartRoas) { chartRoas.data.datasets[0].data = data; chartRoas.data.datasets[0].backgroundColor = colors; chartRoas.update('none'); return; }
   chartRoas = new Chart($('chart-roas'), {
-    type: 'bar',
-    data: {
-      labels: roasLevels.map(r => r + 'x'),
-      datasets: [{ label: 'Ad Spend', data, backgroundColor: colors, borderRadius: 5, borderSkipped: false }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' ' + fmtK(ctx.parsed.y) + ' ad spend' } }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: '#7A6570', font: { family: 'DM Sans', size: 11 }, maxRotation: 0 }
-        },
-        y: {
-          grid: { color: 'rgba(139,58,90,0.07)' },
-          ticks: { color: '#7A6570', font: { family: 'DM Sans', size: 10 }, maxTicksLimit: 5, callback: val => fmtNum(val) }
-        }
-      }
+    type:'bar', data:{ labels: roasLevels.map(r=>r+'x'), datasets:[{label:'Ad Spend',data,backgroundColor:colors,borderRadius:5,borderSkipped:false}] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+fmtK(ctx.parsed.y)+' total ad spend'}} },
+      scales:{ x:{grid:{display:false},ticks:{color:'#7A6570',font:{family:'DM Sans',size:11},maxRotation:0}}, y:{grid:{color:'rgba(139,58,90,.07)'},ticks:{color:'#7A6570',font:{family:'DM Sans',size:10},maxTicksLimit:5,callback:val=>fmtNum(val)}} }
     }
   });
 }
 
 function buildRevenueChart(v, s) {
-  const adSpend    = Math.max(0, s.adSpend);
-  const paidNet    = Math.max(0, s.paidNet);
-  const othRevenue = Math.max(0, s.othRevenue);
-  const data   = [adSpend, paidNet, othRevenue];
-  const labels = ['Ad Spend', 'Paid Net Return', 'Others Revenue'];
-  const colors = ['#8B3A5A', '#C4974A', '#2D6A4F'];
-
-  $('revenue-legend').innerHTML = labels.map((l,i) => `
-    <div class="rev-legend-item">
-      <div class="rev-legend-dot" style="background:${colors[i]}"></div>
-      <div>
-        <span class="rev-legend-lbl">${l}</span>
-        <span class="rev-legend-val">${fmtUsd(data[i])}</span>
-      </div>
-    </div>
-  `).join('');
-
-  if (chartRevenue) {
-    chartRevenue.data.datasets[0].data = data;
-    chartRevenue.update('none');
-    return;
-  }
+  const adSpend = Math.max(0, s.adSpend), paidRev = Math.max(0, s.paidRevenue), othRev = Math.max(0, s.othRevenue);
+  const data=[adSpend,paidRev,othRev], labels=['Ad Spend','Paid Revenue','Other Channels Revenue'], colors=['#8B3A5A','#C4974A','#2D6A4F'];
+  $('revenue-legend').innerHTML = labels.map((l,i)=>`<div class="rev-legend-item"><div class="rev-legend-dot" style="background:${colors[i]}"></div><div><span class="rev-legend-lbl">${l}</span><span class="rev-legend-val">${fmtUsd(data[i])}</span></div></div>`).join('');
+  if (chartRevenue) { chartRevenue.data.datasets[0].data = data; chartRevenue.update('none'); return; }
   chartRevenue = new Chart($('chart-revenue'), {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 6 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const t = ctx.dataset.data.reduce((a,b)=>a+b,0);
-              const pct = t > 0 ? ((ctx.parsed/t)*100).toFixed(1) : 0;
-              return ` ${ctx.label}: ${fmtUsd(ctx.parsed)} (${pct}%)`;
-            }
-          }
-        }
-      }
+    type:'doughnut', data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>{const t=ctx.dataset.data.reduce((a,b)=>a+b,0);return ` ${ctx.label}: ${fmtUsd(ctx.parsed)} (${t>0?((ctx.parsed/t)*100).toFixed(1):0}%)`;}}} }
     }
   });
 }
 
-function buildEvolutionChart(v) {
-  const s            = calc(v, v.targetRoas);
-  const months       = v.months;
-
-  const labels = [], revArr = [], adArr = [], netArr = [];
-  for (let m = 1; m <= months; m++) {
-    const f = m / months;
-    labels.push('M' + m);
-    revArr.push(Math.round(s.revenue * f));
-    adArr.push(Math.round(s.adSpend * f));
-    netArr.push(Math.round((s.revenue - s.adSpend) * f));
-  }
-
-  const ptRadius = months <= 12 ? 4 : months <= 18 ? 3 : 2;
-  const datasets = [
-    { label: 'Cumul. Revenue',    data: revArr, borderColor: '#2D6A4F', backgroundColor: 'rgba(45,106,79,0.08)',   fill: true, tension: 0.35, pointRadius: ptRadius, pointHoverRadius: 6, borderWidth: 2.5 },
-    { label: 'Cumul. Ad Spend',   data: adArr,  borderColor: '#8B3A5A', backgroundColor: 'rgba(139,58,90,0.07)',  fill: true, tension: 0.35, pointRadius: ptRadius, pointHoverRadius: 6, borderWidth: 2.5 },
-    { label: 'Cumul. Net Return', data: netArr, borderColor: '#C4974A', backgroundColor: 'rgba(196,151,74,0.07)', fill: true, tension: 0.35, pointRadius: ptRadius, pointHoverRadius: 6, borderWidth: 2.5 },
-  ];
-
-  $('evolution-legend').innerHTML = datasets.map(d => `
-    <div class="evo-leg-item">
-      <div class="evo-leg-line" style="background:${d.borderColor}"></div>
-      ${d.label}
-    </div>
-  `).join('');
-
-  if (chartEvolution) {
-    chartEvolution.data.labels = labels;
-    chartEvolution.data.datasets.forEach((ds, i) => {
-      ds.data        = datasets[i].data;
-      ds.pointRadius = datasets[i].pointRadius;
-    });
-    chartEvolution.update('none');
-    return;
-  }
-  chartEvolution = new Chart($('chart-evolution'), {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(42,31,36,0.92)',
-          titleColor: '#FAF6F1', bodyColor: '#EDE5DA',
-          padding: 12, cornerRadius: 8, titleFont: { family: 'DM Sans' }, bodyFont: { family: 'DM Sans' },
-          callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmtUsd(ctx.parsed.y) }
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: '#7A6570', font: { family: 'DM Sans', size: 11 }, maxTicksLimit: 13, maxRotation: 0 }
-        },
-        y: {
-          grid: { color: 'rgba(139,58,90,0.07)' },
-          ticks: { color: '#7A6570', font: { family: 'DM Sans', size: 10 }, maxTicksLimit: 6, callback: val => fmtNum(val) }
-        }
-      }
-    }
-  });
-}
-
-// Init
-renderMixUI(70, 30);
 update();
 </script>
 </body>
